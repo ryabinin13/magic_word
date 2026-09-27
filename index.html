@@ -17,7 +17,7 @@
   <defs>
     <filter id="rough" x="-12%" y="-12%" width="124%" height="124%">
       <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="7" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
 
@@ -143,7 +143,6 @@
 
 <main class="stage">
   <header class="title">
-    <h1>Магическое слово</h1>
     <p>нажми кнопку — узнаешь своё предсказание</p>
   </header>
 
@@ -156,11 +155,6 @@
   </section>
 
   <button class="draw" id="draw" type="button">Узнать предсказание</button>
-
-  <div class="progress">
-    <p class="counter" id="counter">Показано 0 из 50</p>
-    <div class="bar"><div class="bar-fill" id="bar"></div></div>
-  </div>
 
   <p class="toast" id="toast" role="status"></p>
 </main>

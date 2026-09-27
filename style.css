@@ -119,14 +119,6 @@ body {
 }
 
 .title { text-align: center; }
-.title h1 {
-  font-size: clamp(2rem, 7vw, 3.2rem);
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--sun);
-  -webkit-text-stroke: 2px var(--ink);
-  paint-order: stroke fill;
-}
 .title p {
   margin-top: 6px;
   font-size: clamp(0.85rem, 2.6vw, 1.05rem);
@@ -144,19 +136,26 @@ body {
   justify-content: center;
   gap: 10px;
   padding: 30px 26px 26px;
-  background: var(--cream);
-  border: 0;
+  /* Фона и рамки у самой бумажки нет — см. ::below. Радиус нужен, чтобы тень
+     повторяла форму бумажки. */
+  border-radius: 20px 14px 22px 16px;
   box-shadow: 8px 8px 0 rgba(22, 35, 61, 0.28);
   transform: rotate(-0.7deg);
 }
-/* Рамка вынесена в ::before и проходит через фильтр rough — получается
-   «нарисованный от руки» неровный контур вместо ровной линии border. */
+/* Заливка и рамка — один и тот же элемент, иначе они расходятся: скруглённая
+   обводка не может накрыть прямой угол (на диагонали она заходит внутрь
+   на 0.1465 толщины), и крем выглядывал бы из-под рамки в углах. Фильтр rough
+   сдвигает заливку и обводку вместе, поэтому бумажка всегда внутри рамки.
+   z-index: -1 уводит слой под текст, он же рисует «нарисованный от руки»
+   неровный контур вместо ровной линии border. */
 .paper::before {
   content: "";
   position: absolute;
-  inset: -3px;
-  border: 3.5px solid var(--ink);
-  border-radius: 20px 14px 22px 16px;
+  inset: 0;
+  z-index: -1;
+  background: var(--cream);
+  border: 4px solid var(--ink);
+  border-radius: inherit;
   filter: url(#rough);
   pointer-events: none;
 }
@@ -207,32 +206,6 @@ body {
 .draw:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--ink); }
 .draw:focus-visible { outline: 3px dashed var(--cream); outline-offset: 4px; }
 .draw:disabled { opacity: 0.65; cursor: progress; }
-
-.progress { width: 100%; max-width: 320px; text-align: center; }
-.counter {
-  display: inline-block;
-  padding: 4px 14px;
-  font-size: 0.9rem;
-  color: var(--ink);
-  background: var(--cream);
-  border: 3px solid var(--ink);
-  border-radius: 13px 9px 14px 10px;
-}
-.bar {
-  margin-top: 8px;
-  height: 16px;
-  background: rgba(255, 246, 229, 0.85);
-  border: 3px solid var(--ink);
-  border-radius: 12px 8px 13px 9px;
-  overflow: hidden;
-}
-.bar-fill {
-  height: 100%;
-  width: 0;
-  /* Оранжевая заливка на кремовой дорожке давала контраст 1.72:1 и не читалась */
-  background: var(--ink);
-  transition: width 0.4s ease;
-}
 
 .toast {
   min-height: 26px;
@@ -289,8 +262,7 @@ body {
 /* Низкие экраны: иначе контент не помещается и страница начинает скроллиться */
 @media (max-height: 660px) {
   .stage { padding-top: 14px; gap: 12px; }
-  .title h1 { font-size: clamp(1.6rem, 5.4vw, 2.2rem); }
-  .title p { font-size: 0.8rem; margin-top: 3px; }
+  .title p { font-size: 0.8rem; }
   .paper { min-height: 132px; padding: 22px 20px 18px; }
   .paper .text { font-size: clamp(0.95rem, 3vw, 1.1rem); }
   .toast { min-height: 0; }
@@ -300,6 +272,6 @@ body {
   .walker-a, .walker-b { animation: none; left: 30%; }
   .walker-b { left: 66%; }
   .paper.pop { animation: none; }
-  .bar-fill, .draw, .toast { transition: none; }
+  .draw, .toast { transition: none; }
   .deco { display: none; }
 }

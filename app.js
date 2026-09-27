@@ -18,7 +18,7 @@
     both: ['ink', 'ink']
   };
 
-  var KEEP_OUT = ['.title', '#paper', '#draw', '.progress', '.toast'];
+  var KEEP_OUT = ['.title', '#paper', '#draw', '.toast'];
   var EDGE = 10;
 
   var predictions = (window.PREDICTIONS || []).filter(function (p) {
@@ -29,8 +29,6 @@
   var textEl = document.getElementById('text');
   var paperEl = document.getElementById('paper');
   var btnEl = document.getElementById('draw');
-  var counterEl = document.getElementById('counter');
-  var barEl = document.getElementById('bar');
   var toastEl = document.getElementById('toast');
   var decoEl = document.getElementById('deco');
 
@@ -67,11 +65,6 @@
     }, 2200);
   }
 
-  function updateProgress() {
-    counterEl.textContent = 'Показано ' + drawn + ' из ' + predictions.length;
-    barEl.style.width = (predictions.length ? (drawn / predictions.length) * 100 : 0) + '%';
-  }
-
   function nextPrediction() {
     if (!bag.length) {
       bag = shuffle(predictions);
@@ -79,7 +72,6 @@
       if (btnEl.textContent === 'Ещё одно') showToast('Новый круг предсказаний!');
     }
     drawn++;
-    updateProgress();
     return bag.pop();
   }
 
@@ -153,9 +145,19 @@
     return nearest;
   }
 
-  function pickColor(y) {
-    if (y > 42 && y < 58) return randomItem(COLORS.both);
-    return randomItem(y < 50 ? COLORS.top : COLORS.bottom);
+  /* Граница фонов проходит не по центру окна (фон повёрнут на -2deg), поэтому
+     берём реальную нижнюю границу верхней половины, а не innerHeight / 2. */
+  function splitY() {
+    var top = document.querySelector('.bg-top');
+    return top ? top.getBoundingClientRect().bottom : innerHeight / 2;
+  }
+
+  /* Цвет подбираем под ту половину, где рисунок реально оказался. Раньше сюда
+     попадала высота в процентах, а сравнивалась с пикселями — из-за этого
+     тёмно-синие детали оказывались на синем фоне (контраст 1.8) и были не видны. */
+  function pickColor(centerY, split) {
+    if (Math.abs(centerY - split) < EDGE * 3) return randomItem(COLORS.both);
+    return randomItem(centerY < split ? COLORS.top : COLORS.bottom);
   }
 
   function place(id, isWorker) {
@@ -169,6 +171,7 @@
     decoEl.appendChild(node);
 
     var rects = keepOutRects();
+    var split = splitY();
     var best = null;
     var bestGap = -Infinity;
     for (var attempt = 0; attempt < 60; attempt++) {
@@ -180,7 +183,7 @@
       var gap = clearance(b, rects);
       if (gap > bestGap) { bestGap = gap; best = { point: point, box: b }; }
       if (gap >= EDGE) {
-        node.classList.add(pickColor(b.top + b.height / 2));
+        node.classList.add(pickColor(b.top + b.height / 2, split));
         return;
       }
     }
@@ -189,7 +192,7 @@
     if (best) {
       node.style.left = best.point.x + '%';
       node.style.top = best.point.y + '%';
-      node.classList.add(pickColor(best.box.top + best.box.height / 2));
+      node.classList.add(pickColor(best.box.top + best.box.height / 2, split));
     } else {
       node.remove();
     }
@@ -206,9 +209,7 @@
     numEl.textContent = 'предсказания не загрузились';
     textEl.textContent = 'Файл predictions.js пустой. Добавь предсказания в a.txt и выполни в папке проекта: node build.js';
     btnEl.disabled = true;
-    counterEl.textContent = 'Показано 0 из 0';
   } else {
-    updateProgress();
     btnEl.addEventListener('click', draw);
     spawnDecor();
   }
