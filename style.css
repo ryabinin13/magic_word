@@ -1,0 +1,305 @@
+:root {
+  --ink: #16233d;
+  --blue: #2f6fe4;
+  --blue-deep: #1b47a8;
+  --orange: #ff8a1f;
+  --orange-deep: #b8500a;
+  --cream: #fff6e5;
+  --sun: #ffd23f;
+  --font: "Comic Neue", "Comic Sans MS", "Segoe Print", cursive, sans-serif;
+  /* Положение шва долями высоты .bg-inner (она равна 120% высоты экрана) */
+  --seam: 68.33%;
+  --squig-h: 44px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  min-height: 100vh;
+  background: var(--blue-deep);
+  color: var(--ink);
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---------- фон: синий сверху, оранжевый снизу ---------- */
+
+.bg { position: fixed; inset: 0; overflow: hidden; z-index: 0; }
+.bg-inner { position: absolute; inset: -10%; transform: rotate(-2deg); }
+.bg-top, .bg-bottom { position: absolute; left: 0; right: 0; height: 50%; }
+.bg-top { top: 0; bottom: auto; height: var(--seam); background: var(--blue); }
+.bg-bottom { top: var(--seam); bottom: 0; height: auto; background: var(--orange); }
+
+.squiggle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--seam) - var(--squig-h) / 2);
+  width: 100%;
+  height: var(--squig-h);
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.squiggle path { vector-effect: non-scaling-stroke; }
+
+/* ---------- общий стиль рисунков ---------- */
+
+.deco svg, .walker, .pin {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--ink);
+}
+/* Заливка работает и для символов спрайта, и для скрепки (раньше .sprite .fill
+   не покрывала .pin, из-за чего центр скрепки оставался пустым кольцом) */
+.fill { fill: currentColor; stroke: none; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+/* Обводка не должна истончаться вместе с размером значка */
+.sprite path, .sprite circle, .sprite rect, .sprite line {
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- декор: сотрудники и запчасти ---------- */
+
+.deco-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+.deco { position: absolute; transform-origin: 50% 50%; }
+.deco svg { display: block; width: 100%; height: auto; min-width: 68px; }
+/* Ящик с надписью: без нижнего предела размера «ЗАПЧАСТИ» превращалась в пятно */
+.deco--p-crate svg { min-width: 120px; }
+.deco.blue { color: var(--blue-deep); }
+.deco.cream { color: var(--cream); }
+
+.walkers {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 22vh;
+  z-index: 2;
+  pointer-events: none;
+}
+.walker { position: absolute; top: 0; width: 11vmin; height: 16.5vmin; stroke-width: 4; }
+/* Отрицательные задержки убирают «мёртвую зону» 0–2.5 с, когда оба человека
+   ещё за пределами экрана. Периоды разные (34 с и 46 с), поэтому выпадают
+   из кадра не одновременно. */
+.walker-a { animation: stroll-a 34s linear infinite; animation-delay: -9s; }
+.walker-b { animation: stroll-b 46s linear infinite; animation-delay: -24s; }
+
+@keyframes stroll-a {
+  0%   { left: -14%; top: 1%; }
+  50%  { left: 45%;  top: 6%; }
+  100% { left: 108%; top: 1%; }
+}
+@keyframes stroll-b {
+  0%   { left: 108%; top: 3%; }
+  50%  { left: 45%;  top: 8%; }
+  100% { left: -14%; top: 3%; }
+}
+
+/* ---------- центральный блок ---------- */
+
+.stage {
+  position: relative;
+  z-index: 3;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Прижат к верху: так под контентом остаётся свободная полоса, где проходит
+     волнистая граница фона. По центру она всегда пряталась под бумажкой. */
+  justify-content: flex-start;
+  gap: 20px;
+  padding: 7vh 20px 40px;
+}
+
+.title { text-align: center; }
+.title h1 {
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--sun);
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+}
+.title p {
+  margin-top: 6px;
+  font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+  color: #fff;
+  text-shadow: 0 1.5px 0 rgba(22, 35, 61, 0.55);
+}
+
+.paper {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 30px 26px 26px;
+  background: var(--cream);
+  border: 0;
+  box-shadow: 8px 8px 0 rgba(22, 35, 61, 0.28);
+  transform: rotate(-0.7deg);
+}
+/* Рамка вынесена в ::before и проходит через фильтр rough — получается
+   «нарисованный от руки» неровный контур вместо ровной линии border. */
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border: 3.5px solid var(--ink);
+  border-radius: 20px 14px 22px 16px;
+  filter: url(#rough);
+  pointer-events: none;
+}
+.paper.pop { animation: paper-pop 0.45s ease; }
+
+@keyframes paper-pop {
+  0%   { transform: rotate(-0.7deg) scale(0.9); }
+  60%  { transform: rotate(-0.7deg) scale(1.035); }
+  100% { transform: rotate(-0.7deg) scale(1); }
+}
+
+.pin {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  color: var(--orange-deep);
+}
+
+.paper .num {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--orange-deep);
+}
+.paper .text {
+  font-size: clamp(1.05rem, 3.4vw, 1.28rem);
+  line-height: 1.55;
+}
+
+.draw {
+  padding: 15px 30px;
+  font-family: inherit;
+  font-size: clamp(1rem, 3.2vw, 1.2rem);
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--sun);
+  border: 3px solid var(--ink);
+  border-radius: 18px 12px 20px 14px;
+  box-shadow: 5px 5px 0 var(--ink);
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.draw:hover { transform: rotate(-1.5deg) scale(1.03); }
+.draw:active { transform: translate(4px, 4px); box-shadow: 1px 1px 0 var(--ink); }
+.draw:focus-visible { outline: 3px dashed var(--cream); outline-offset: 4px; }
+.draw:disabled { opacity: 0.65; cursor: progress; }
+
+.progress { width: 100%; max-width: 320px; text-align: center; }
+.counter {
+  display: inline-block;
+  padding: 4px 14px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 13px 9px 14px 10px;
+}
+.bar {
+  margin-top: 8px;
+  height: 16px;
+  background: rgba(255, 246, 229, 0.85);
+  border: 3px solid var(--ink);
+  border-radius: 12px 8px 13px 9px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  width: 0;
+  /* Оранжевая заливка на кремовой дорожке давала контраст 1.72:1 и не читалась */
+  background: var(--ink);
+  transition: width 0.4s ease;
+}
+
+.toast {
+  min-height: 26px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+  color: var(--ink);
+  background: var(--sun);
+  border: 3px solid var(--ink);
+  border-radius: 14px 10px 15px 11px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+.hint {
+  position: fixed;
+  left: 50%;
+  bottom: 6px;
+  transform: translateX(-50%);
+  z-index: 4;
+  max-width: 92vw;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--ink);
+  background: rgba(255, 246, 229, 0.85);
+  border-radius: 10px;
+  padding: 2px 10px;
+}
+.hint code { font-family: inherit; }
+
+.noscript {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 5;
+  padding: 10px 18px;
+  background: var(--cream);
+  border: 3px solid var(--ink);
+  border-radius: 14px 10px 15px 11px;
+}
+
+@media (max-width: 560px) {
+  :root { --seam: 66.6%; --squig-h: 40px; }
+  .stage { padding: 5vh 16px 32px; gap: 16px; }
+  .paper { padding: 26px 20px 22px; min-height: 150px; }
+  .deco svg { min-width: 62px; }
+  .deco--p-crate svg { min-width: 108px; }
+  .walkers { height: 16vh; }
+  .walker { width: 15vmin; height: 22.5vmin; }
+}
+
+/* Низкие экраны: иначе контент не помещается и страница начинает скроллиться */
+@media (max-height: 660px) {
+  .stage { padding-top: 14px; gap: 12px; }
+  .title h1 { font-size: clamp(1.6rem, 5.4vw, 2.2rem); }
+  .title p { font-size: 0.8rem; margin-top: 3px; }
+  .paper { min-height: 132px; padding: 22px 20px 18px; }
+  .paper .text { font-size: clamp(0.95rem, 3vw, 1.1rem); }
+  .toast { min-height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walker-a, .walker-b { animation: none; left: 30%; }
+  .walker-b { left: 66%; }
+  .paper.pop { animation: none; }
+  .bar-fill, .draw, .toast { transition: none; }
+  .deco { display: none; }
+}
