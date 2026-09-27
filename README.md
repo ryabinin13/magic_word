@@ -50,27 +50,51 @@ python3 -m http.server 8000
 
 ## Публикация на GitHub Pages
 
-Репозиторий уже содержит всё нужное, `predictions.js` в нём есть, поэтому Pages
-ничего собирать не будет.
+Репозиторий: <https://github.com/ryabinin13/magic_word>
+Адрес сайта после публикации: <https://ryabinin13.github.io/magic_word/>
+
+В репозитории уже лежит всё нужное, включая `predictions.js`, поэтому Pages
+ничего собирать не будет — просто отдаёт файлы как есть.
+
+Код в этой папке уже закоммичен, осталось отправить его на GitHub. Нужен любой
+из двух вариантов.
+
+**Вариант 1 — SSH-ключ** (если ключа ещё нет):
 
 ```bash
-# 1. Создай пустой репозиторий на github.com с именем magic_word
-#    ( галочку "Add a README file" НЕ ставим )
+ssh-keygen -t ed25519 -C "ryabinin13@users.noreply.github.com"
+cat ~/.ssh/id_ed25519.pub
+```
 
-# 2. Свяжи его с этой папкой
-git remote add origin git@github.com:<твой_юзер>/magic_word.git
+Скопированный вывод вставить в GitHub: **Settings → SSH and GPG keys → New SSH key**.
+Потом:
 
-# 3. Отправь код
+```bash
+cd ~/code/magic_word
+git remote set-url origin git@github.com:ryabinin13/magic_word.git
 git push -u origin main
 ```
 
-Дальше в репозитории на GitHub:
+**Вариант 2 — токен** (если ключ настраивать не хочется):
+
+Создай токен: **GitHub → Settings → Developer settings → Personal access tokens →
+Fine-grained tokens → Generate**, доступ только к репозиторию `magic_word`,
+разрешение **Contents: Read and write**. Дальше:
+
+```bash
+cd ~/code/magic_word
+git push -u origin main
+# в поле Username: ryabinin13
+# в поле Password: вставь токен
+```
+
+После отправки включи сам сайт в репозитории:
 
 **Settings → Pages → Build and deployment → Source: Deploy from a branch**,
-ветка `main`, папка `/ (root)`. Через минуту сайт будет доступен по адресу:
+ветка `main`, папка `/ (root)`. Через минуту-полторы сайт будет доступен по адресу:
 
 ```
-https://<твой_юзер>.github.io/magic_word/
+https://ryabinin13.github.io/magic_word/
 ```
 
 Дальше каждое обновление предсказаний — это `node build.js`, `git add .`, `git commit`, `git push`.
