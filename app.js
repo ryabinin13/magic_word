@@ -8,40 +8,71 @@
   var numEl = document.getElementById('num');
   var textEl = document.getElementById('text');
   var btnEl = document.getElementById('draw');
-  var toastEl = document.getElementById('toast');
 
-  var bag = [];
-  var shownOnce = false;
-  var toastTimer = null;
+  /* Одно предсказание за визит: после первого нажатия всё остальное
+     игнорируется, кнопка остаётся задизейбленной. */
+  var drawn = false;
+  var rolling = false;
 
-  function shuffle(list) {
-    var copy = list.slice();
-    for (var i = copy.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = copy[i];
-      copy[i] = copy[j];
-      copy[j] = tmp;
-    }
-    return copy;
+  /* Мотание: первые мелькания каждые ~40мс (быстро-быстро), дальше интервал
+     растёт по квадрату прогресса до ~620мс (медленно-медленно), на4-й секунде
+     — финальное предсказание. */
+  var ROLL_MS = 4000;
+  var FAST_MS = 40;
+  var SLOW_MS = 620;
+
+  var reduceMotion = !!(window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  function randomPrediction() {
+    return predictions[Math.floor(Math.random() * predictions.length)];
   }
 
-  function showToast(message) {
-    toastEl.textContent = message;
-    toastEl.classList.add('show');
-    window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(function () {
-      toastEl.classList.remove('show');
-    }, 2200);
+  function show(item) {
+    numEl.textContent = 'Предсказание № ' + item.n;
+    textEl.textContent = item.text;
+    fitText();
   }
 
-  function nextPrediction() {
-    if (!bag.length) {
-      bag = shuffle(predictions);
-      /* Колода кончилась не в первый раз — значит начался новый круг. */
-      if (shownOnce) showToast('Новый круг предсказаний!');
+  /* Лёгкое мерцание на каждом переключении — «мотание» видно. */
+  function flicker(el, duration) {
+    if (el.animate) {
+      el.animate([{ opacity: 0.15 }, { opacity: 1 }],
+        { duration: duration, easing: 'ease-out' });
     }
-    shownOnce = true;
-    return bag.pop();
+  }
+
+  /* Финал: предсказание проявляется чуть заметным вздохом. */
+  function reveal() {
+    if (!textEl.animate) return;
+    var opts = { duration: 340, easing: 'cubic-bezier(0.2, 0.8, 0.3, 1)' };
+    textEl.animate(
+      [{ opacity: 0, transform: 'scale(1.03)' }, { opacity: 1, transform: 'none' }],
+      opts);
+    numEl.animate([{ opacity: 0 }, { opacity: 1 }], opts);
+  }
+
+  function roll(final, done) {
+    var start = performance.now();
+    var nextFlip = start;
+
+    function frame(now) {
+      var p = (now - start) / ROLL_MS;
+      if (p >= 1) {
+        show(final);
+        reveal();
+        done();
+        return;
+      }
+      if (now >= nextFlip) {
+        show(randomPrediction());
+        flicker(textEl, 110);
+        flicker(numEl, 110);
+        nextFlip = now + FAST_MS + (SLOW_MS - FAST_MS) * p * p;
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   }
 
   function textHeight() {
@@ -62,10 +93,23 @@
   }
 
   function draw() {
-    var item = nextPrediction();
-    numEl.textContent = 'Предсказание № ' + item.n;
-    textEl.textContent = item.text;
-    fitText();
+    if (drawn || rolling) return;
+    drawn = true;
+    btnEl.disabled = true;
+    var final = randomPrediction();
+
+    if (reduceMotion) {
+      show(final);
+      btnEl.textContent = 'Предсказание готово';
+      return;
+    }
+
+    rolling = true;
+    btnEl.textContent = 'Считаем…';
+    roll(final, function () {
+      rolling = false;
+      btnEl.textContent = 'Предсказание готово';
+    });
   }
 
   if (!predictions.length) {

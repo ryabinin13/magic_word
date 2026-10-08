@@ -111,19 +111,6 @@ picture { display: block; }
 .draw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .draw:disabled { opacity: 0.7; cursor: default; }
 
-/* Тёмно-синяя пилюля читается и на панели, и на золоте, и на белом фоне. */
-.toast {
-  padding: 0.3em 0.9em;
-  font-size: clamp(11px, 0.9166vh, 14px);
-  font-size: clamp(11px, 0.6878cqw, 14px);
-  color: var(--paper);
-  background: var(--ink);
-  border-radius: 999px;
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-.toast.show { opacity: 1; }
-
 .noscript {
   position: fixed;
   left: 50%;
@@ -180,13 +167,8 @@ picture { display: block; }
     font-size: clamp(13px, 1.7818vw, 17px);
     font-size: clamp(13px, 1.7818cqw, 17px);
   }
-
-  .toast {
-    font-size: clamp(11px, 1.4476vw, 14px);
-    font-size: clamp(11px, 1.4476cqw, 14px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .draw, .toast { transition: none; }
+  .draw { transition: none; }
 }
