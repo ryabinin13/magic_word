@@ -13,8 +13,14 @@
 <div class="poster">
   <!-- Макет из Photoshop (предсказания.psd), 1890×1418. В нём по центру светлая
        панель 716×243 (x587..1303, y461..704), а внутри неё — текстовое поле
-       648×189 (x621..1269, y488..677). Сюда встаёт живой контент. -->
-  <img class="art" src="assets/design.png" alt="" width="1890" height="1418" aria-hidden="true">
+       648×189 (x621..1269, y488..677). Сюда встаёт живой контент.
+       Для телефона (портрет) — отдельный вертикальный макет 898×1418 из
+       папки phone/: панель 716×243 при (91, 461), поле 648×189 при (125, 488),
+       центр тот же (50%, 41.079%). -->
+  <picture>
+    <source media="(max-width: 959px) and (orientation: portrait)" srcset="assets/design-phone.png">
+    <img class="art" src="assets/design.png" alt="" width="1890" height="1418" aria-hidden="true">
+  </picture>
 
   <main class="card">
     <p class="num" id="num">предсказание дня</p>
