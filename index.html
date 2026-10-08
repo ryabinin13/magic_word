@@ -10,18 +10,21 @@
 </head>
 <body>
 
-<main class="stage">
-  <p class="lead">нажми кнопку — узнаешь своё предсказание</p>
+<div class="poster">
+  <!-- Макет из Photoshop (предсказания.psd), 1890×1418. В нём по центру светлая
+       панель 716×243 (x587..1303, y461..704), а внутри неё — текстовое поле
+       648×189 (x621..1269, y488..677). Сюда встаёт живой контент. -->
+  <img class="art" src="assets/design.png" alt="" width="1890" height="1418" aria-hidden="true">
 
-  <section class="paper" id="paper">
+  <main class="card">
     <p class="num" id="num">предсказание дня</p>
     <p class="text" id="text">Здесь появится твоё предсказание. Нажимай на кнопку — и узнаешь, что ждёт тебя завтра.</p>
-  </section>
-
-  <button class="draw" id="draw" type="button">Узнать предсказание</button>
-
-  <p class="toast" id="toast" role="status"></p>
-</main>
+    <div class="actions">
+      <button class="draw" id="draw" type="button">Узнать предсказание</button>
+      <p class="toast" id="toast" role="status"></p>
+    </div>
+  </main>
+</div>
 
 <noscript>
   <div class="noscript">Для рандомайзера нужен включённый JavaScript.</div>

@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SRC = path.join(__dirname, 'a.txt');
+const SRC = path.join(__dirname, 'new.txt');
 const OUT = path.join(__dirname, 'predictions.js');
 const LINE_RE = /^\s*(\d+)\.\s*(.+?)\s*$/;
 
@@ -36,7 +36,7 @@ if (broken.length) {
 }
 
 if (!items.length) {
-  fail('в a.txt нет ни одного предсказания');
+  fail('в new.txt нет ни одного предсказания');
 }
 
 const seen = new Map();
@@ -50,7 +50,7 @@ items.forEach((item) => {
 const body = items.map((item) => '  ' + JSON.stringify(item)).join(',\n');
 const out = [
   '// Сгенерировано автоматически: node build.js',
-  '// Источник — a.txt. Правь a.txt, потом запусти сборку.',
+  '// Источник — new.txt. Правь new.txt, потом запусти сборку.',
   'window.PREDICTIONS = [',
   body,
   '];',

@@ -1,8 +1,9 @@
 :root {
-  --blue: #1b47a8;
-  --white: #ffffff;
-  /* Приглушённый белый для второстепенного текста: контраст 5.9:1 на синем фоне */
-  --white-dim: #c7d9ff;
+  /* Цвета из макета: тёмно-синий #001c4f, фон страницы белый — как в исходном
+     экспорте Photoshop (body bgcolor="#FFFFFF"). */
+  --ink: #001c4f;
+  --ink-soft: #0a3a95;
+  --paper: #ffffff;
   --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -10,68 +11,99 @@
 
 body {
   font-family: var(--font);
-  background: var(--blue);
-  color: var(--white);
-  -webkit-text-size-adjust: 100%;
-}
-
-.stage {
+  background: var(--paper);
+  color: var(--ink);
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  padding: 32px 20px;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Макет 1890×1418 целиком помещается в экран. 1cqw = 18.9 макетных пикселей. */
+.poster {
+  position: relative;
+  width: min(100vw, calc(100svh * 1890 / 1418));
+  container-type: inline-size;
+}
+
+.art { display: block; width: 100%; height: auto; }
+
+/* Карточка — это ровно текстовое поле макета: 648×189 при (621, 488),
+   центр поля 945×582.5, то есть 50% ширины и 41.079% высоты макета. */
+.card {
+  position: absolute;
+  left: 50%;
+  top: 41.079%;
+  transform: translate(-50%, -50%);
+  width: 34.2857%;   /* 648 / 1890 */
+  height: 13.3286%;  /* 189 / 1418 */
+}
+
+/* Подпись над панелью: низ подписи на 58 макетных пикселей выше поля. */
+.num {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 3.0688cqw);
   text-align: center;
+  font-size: clamp(11px, 0.7937cqw, 15px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-.lead {
-  font-size: 1rem;
-  color: var(--white-dim);
-}
-
-.paper {
+/* Текст строго внутри поля 648×189. --fit уменьшает кегль, если не влезает
+   (см. fitText в app.js), поэтому обрезки не бывает. */
+.text {
   width: 100%;
-  max-width: 34rem;
-  min-height: 9rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: calc(var(--fit, 1) * clamp(15px, 1.6402cqw, 34px));
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+/* Кнопка и плашка под панелью: верх на 53 макетных пикселя ниже поля. */
+.actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 2.8042cqw);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.paper .num {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--white-dim);
-}
-
-.paper .text {
-  font-size: 1.25rem;
-  line-height: 1.6;
+  align-items: center;
+  gap: 0.8466cqw;    /* 16 макетных пикселей */
 }
 
 .draw {
-  padding: 12px 28px;
+  padding: 0.65em 1.7em;
   font-family: inherit;
-  font-size: 1.1rem;
+  font-size: clamp(13px, 0.8466cqw, 17px);
   font-weight: 600;
-  color: var(--blue);
-  background: var(--white);
+  color: var(--paper);
+  background: var(--ink);
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.08s ease;
 }
-.draw:hover { background: var(--white-dim); }
-.draw:focus-visible { outline: 3px solid var(--white-dim); outline-offset: 3px; }
+.draw:hover { background: var(--ink-soft); }
+.draw:active { transform: translateY(2px); }
+.draw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 .draw:disabled { opacity: 0.7; cursor: default; }
 
+/* Тёмно-синяя пилюля читается и на панели, и на золоте, и на белом фоне. */
 .toast {
-  min-height: 1.5rem;
-  font-size: 0.95rem;
-  color: var(--white-dim);
+  padding: 0.3em 0.9em;
+  font-size: clamp(11px, 0.6878cqw, 14px);
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 999px;
   opacity: 0;
   transition: opacity 0.25s ease;
 }
@@ -83,15 +115,43 @@ body {
   bottom: 16px;
   transform: translateX(-50%);
   padding: 10px 18px;
-  color: var(--blue);
-  background: var(--white);
+  color: var(--paper);
+  background: var(--ink);
   border-radius: 6px;
 }
 
-@media (max-width: 560px) {
-  .paper .text { font-size: 1.15rem; }
+/* Экран не держит макет целиком (узкий или низкий) — макет встаёт сверху
+   на всю ширину, а контент идёт под ним обычным потоком. */
+@media (max-width: 959px), (max-height: 719px) {
+  body { display: block; }
+
+  .poster { width: 100%; }
+
+  .card {
+    position: static;
+    transform: none;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 22px 18px 36px;
+  }
+
+  .num,
+  .actions { position: static; }
+
+  .actions { gap: 14px; }
+
+  .text {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    font-size: calc(var(--fit, 1) * clamp(17px, 4.6vw, 26px));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast { transition: none; }
+  .draw, .toast { transition: none; }
 }
