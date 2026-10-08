@@ -5,7 +5,6 @@
     return p && typeof p.text === 'string' && p.text.trim();
   });
 
-  var numEl = document.getElementById('num');
   var textEl = document.getElementById('text');
   var btnEl = document.getElementById('draw');
 
@@ -29,7 +28,6 @@
   }
 
   function show(item) {
-    numEl.textContent = 'Предсказание № ' + item.n;
     textEl.textContent = item.text;
     fitText();
   }
@@ -49,7 +47,6 @@
     textEl.animate(
       [{ opacity: 0, transform: 'scale(1.03)' }, { opacity: 1, transform: 'none' }],
       opts);
-    numEl.animate([{ opacity: 0 }, { opacity: 1 }], opts);
   }
 
   function roll(final, done) {
@@ -67,7 +64,6 @@
       if (now >= nextFlip) {
         show(randomPrediction());
         flicker(textEl, 110);
-        flicker(numEl, 110);
         nextFlip = now + FAST_MS + (SLOW_MS - FAST_MS) * p * p;
       }
       requestAnimationFrame(frame);
@@ -113,7 +109,6 @@
   }
 
   if (!predictions.length) {
-    numEl.textContent = 'предсказания не загрузились';
     textEl.textContent = 'Файл predictions.js пустой. Добавь предсказания в new.txt и выполни в папке проекта: node build.js';
     btnEl.disabled = true;
     fitText();

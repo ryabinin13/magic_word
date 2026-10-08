@@ -48,24 +48,6 @@ picture { display: block; }
   height: 13.3286%;  /* 189 / 1418 */
 }
 
-/* Подпись над панелью: низ подписи на 58 макетных пикселей выше поля.
-   Отступ задан в % высоты поля (58 / 189 = 30.6878%) — это те же 58 пикселей
-   и на десктопном макете, и на телефонном: поле в обоих 189px высотой. */
-.num {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(100% + 30.6878%);
-  text-align: center;
-  font-size: clamp(11px, 1.0577vh, 15px);
-  font-size: clamp(11px, 0.7937cqw, 15px);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* Текст строго внутри поля 648×189. --fit уменьшает кегль, если не влезает
-   (см. fitText в app.js), поэтому обрезки не бывает. */
 .text {
   width: 100%;
   height: 100%;
@@ -79,7 +61,7 @@ picture { display: block; }
   font-weight: 600;
 }
 
-/* Кнопка и плашка под панелью: верх на 53 макетных пикселя ниже поля —
+/* Кнопка под панелью: верх на 53 макетных пикселя ниже поля —
    53 / 189 = 28.0423% высоты поля, те же 53 пикселя на обоих макетах. */
 .actions {
   position: absolute;
@@ -150,12 +132,9 @@ picture { display: block; }
 
   .card { width: 72.1604%; }   /* 648 / 898 */
 
-  .num {
-    font-size: clamp(11px, 1.6704vw, 15px);
-    font-size: clamp(11px, 1.6704cqw, 15px);
-  }
-
-  .text {
+/* Текст строго внутри поля 648×189. --fit уменьшает кегль, если не влезает
+   (см. fitText в app.js), поэтому обрезки не бывает. */
+.text {
     font-size: calc(var(--fit, 1) * clamp(12px, 3.4519vw, 34px));
     font-size: calc(var(--fit, 1) * clamp(12px, 3.4519cqw, 34px));
   }
