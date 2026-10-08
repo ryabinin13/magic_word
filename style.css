@@ -22,11 +22,13 @@ body {
 }
 
 /* Макет 1890×1418 целиком помещается в экран. 1cqw = 18.9 макетных пикселей.
-   Перед каждой cqw-декларацией идёт запасная на vw (а у .poster — на 100vh):
-   старые браузеры не знают cqw и svh, их декларации отбрасываются целиком, и
-   без запасных значений подпись, текст и кнопка съезжаются в одну кучу. */
+   Перед каждой cqw-декларацией идёт запасная на vh (макет всегда считается от
+   высоты экрана, а 1cqw в этом случае = 1.3326vh / 100): старые браузеры не
+   знают cqw и svh, их декларации отбрасываются целиком, и без запасных значений
+   подпись, текст и кнопка съезжаются в одну кучу. */
 .poster {
   position: relative;
+  flex-shrink: 0;   /* иначе флекс-контейнер сожмёт макет до ширины экрана */
   width: min(100vw, calc(100vh * 1890 / 1418));
   width: min(100vw, calc(100svh * 1890 / 1418));
   container-type: inline-size;
@@ -50,10 +52,10 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(100% + 3.0688vw);
+  bottom: calc(100% + 4.0897vh);
   bottom: calc(100% + 3.0688cqw);
   text-align: center;
-  font-size: clamp(11px, 0.7937vw, 15px);
+  font-size: clamp(11px, 1.0577vh, 15px);
   font-size: clamp(11px, 0.7937cqw, 15px);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -69,7 +71,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  font-size: calc(var(--fit, 1) * clamp(15px, 1.6402vw, 34px));
+  font-size: calc(var(--fit, 1) * clamp(15px, 2.1858vh, 34px));
   font-size: calc(var(--fit, 1) * clamp(15px, 1.6402cqw, 34px));
   line-height: 1.4;
   font-weight: 600;
@@ -80,19 +82,19 @@ body {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 2.8042vw);
+  top: calc(100% + 3.7373vh);
   top: calc(100% + 2.8042cqw);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.8466vw;    /* 16 макетных пикселей */
+  gap: 1.1282vh;    /* 16 макетных пикселей */
   gap: 0.8466cqw;
 }
 
 .draw {
   padding: 0.65em 1.7em;
   font-family: inherit;
-  font-size: clamp(13px, 0.8466vw, 17px);
+  font-size: clamp(13px, 1.1282vh, 17px);
   font-size: clamp(13px, 0.8466cqw, 17px);
   font-weight: 600;
   color: var(--paper);
@@ -110,7 +112,7 @@ body {
 /* Тёмно-синяя пилюля читается и на панели, и на золоте, и на белом фоне. */
 .toast {
   padding: 0.3em 0.9em;
-  font-size: clamp(11px, 0.6878vw, 14px);
+  font-size: clamp(11px, 0.9166vh, 14px);
   font-size: clamp(11px, 0.6878cqw, 14px);
   color: var(--paper);
   background: var(--ink);
@@ -131,35 +133,17 @@ body {
   border-radius: 6px;
 }
 
-/* Экран не держит макет целиком (узкий или низкий) — макет встаёт сверху
-   на всю ширину, а контент идёт под ним обычным потоком. */
+/* Экран не вмещает макет целиком (телефон, портретный планшет, низкое окно):
+   макет занимает всю высоту экрана и обрезается по бокам — панель с живым
+   текстом остаётся ровно на своём месте, контент не уезжает с картинки.
+   На широких экранах этот же расчёт даёт ровно те же размеры, что и min()
+   выше, поэтому компьютерная вёрстка не меняется. */
 @media (max-width: 959px), (max-height: 719px) {
-  body { display: block; }
+  html, body { overflow: hidden; }
 
-  .poster { width: 100%; }
-
-  .card {
-    position: static;
-    transform: none;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    padding: 22px 18px 36px;
-  }
-
-  .num,
-  .actions { position: static; }
-
-  .actions { gap: 14px; }
-
-  .text {
-    width: 100%;
-    height: auto;
-    overflow: visible;
-    font-size: calc(var(--fit, 1) * clamp(17px, 4.6vw, 26px));
+  .poster {
+    width: calc(100vh * 1890 / 1418);
+    width: calc(100svh * 1890 / 1418);
   }
 }
 
